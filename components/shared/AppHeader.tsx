@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Calendar, Map, Activity, Search, User, Users, Home, Plus } from "lucide-react"
+import { Menu, X, Calendar, Map, Activity, Search, User, Users, Home, Plus, DollarSign, Sparkles } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
 interface AppHeaderProps {
@@ -15,6 +15,8 @@ const MENU_ITEMS = [
     { label: "Calendar", href: "/calendar", icon: Calendar },
     { label: "My Trips", href: "/my-trips", icon: Map },
     { label: "Create Trip", href: "/create-trip", icon: Plus },
+    { label: "User Budget", href: "/user-budget", icon: DollarSign },
+    { label: "Recommend", href: "/recommend", icon: Sparkles },
     { label: "Community", href: "/community", icon: Users },
     { label: "Search", href: "/search", icon: Search },
     { label: "Profile", href: "/profile", icon: User },
