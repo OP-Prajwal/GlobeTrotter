@@ -1,12 +1,26 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { User, Search, MapPin, Loader2, Heart, MessageCircle, Share2, Calendar, Plus, X, Navigation } from "lucide-react"
+import { User, Search, MapPin, Loader2, Heart, MessageCircle, Share2, Calendar, Plus, X, Navigation, Send, Image as ImageIcon } from "lucide-react"
 import { getCommunityPosts, getUserTripsForSharing, shareTrip, likeTrip, type CommunityPost } from "@/app/actions/community"
+import { addComment, getComments } from "@/app/actions/comments"
 import { searchDestinations } from "@/app/actions/destinations"
 import { GlassDropdown } from "@/app/search/GlassDropdown"
+import { ImageUploadZone } from "@/app/components/ImageUploadZone"
 import { format } from "date-fns"
 import { motion, AnimatePresence } from "framer-motion"
+
+// Comment Interface
+interface Comment {
+    id: string
+    content: string
+    createdAt: Date
+    user: {
+        firstName: string | null
+        lastName: string | null
+        avatarUrl: string | null
+    }
+}
 
 export default function CommunityPage() {
     const [posts, setPosts] = useState<CommunityPost[]>([])
@@ -21,6 +35,7 @@ export default function CommunityPage() {
     const [postLat, setPostLat] = useState<number | undefined>(undefined)
     const [postLng, setPostLng] = useState<number | undefined>(undefined)
     const [postDescription, setPostDescription] = useState("")
+    const [postImages, setPostImages] = useState<string[]>([])
     const [isPosting, setIsPosting] = useState(false)
 
     // Autocomplete State
@@ -29,6 +44,12 @@ export default function CommunityPage() {
 
     // Controls
     const [filterBy, setFilterBy] = useState("All") // "All", "Nearby"
+
+    // Comments State: map postId -> comments[]
+    const [expandedComments, setExpandedComments] = useState<Record<string, boolean>>({})
+    const [commentsData, setCommentsData] = useState<Record<string, Comment[]>>({})
+    const [newCommentText, setNewCommentText] = useState<Record<string, string>>({})
+    const [loadingComments, setLoadingComments] = useState<Record<string, boolean>>({})
 
     async function loadPosts(lat?: number, lng?: number) {
         const data = await getCommunityPosts("", lat, lng)
@@ -82,7 +103,7 @@ export default function CommunityPage() {
     // Autocomplete Search
     useEffect(() => {
         const timer = setTimeout(async () => {
-            if (postLocation.length >= 3 && !postLat) { // Only search if we haven't selected a valid lat yet to avoid loop on selection
+            if (postLocation.length >= 3 && !postLat) {
                 const results = await searchDestinations(postLocation)
                 setSuggestions(results)
                 setShowSuggestions(true)
@@ -103,8 +124,8 @@ export default function CommunityPage() {
     const handleShare = async () => {
         if (!selectedTripId) return
         setIsPosting(true)
-        await shareTrip(selectedTripId, postLocation, postDescription, postLat, postLng)
-        await loadPosts() // Refresh with standard sort
+        await shareTrip(selectedTripId, postLocation, postDescription, postLat, postLng, postImages)
+        await loadPosts()
         setIsPosting(false)
         setIsModalOpen(false)
         // Reset
@@ -112,6 +133,7 @@ export default function CommunityPage() {
         setPostLat(undefined)
         setPostLng(undefined)
         setPostDescription("")
+        setPostImages([])
         setSelectedTripId("")
     }
 
@@ -122,6 +144,33 @@ export default function CommunityPage() {
         await likeTrip(id)
     }
 
+    const toggleComments = async (tripId: string) => {
+        setExpandedComments(prev => ({ ...prev, [tripId]: !prev[tripId] }))
+
+        if (!expandedComments[tripId] && !commentsData[tripId]) {
+            // Load comments if opening and not loaded
+            setLoadingComments(prev => ({ ...prev, [tripId]: true }))
+            const comments = await getComments(tripId)
+            setCommentsData(prev => ({ ...prev, [tripId]: comments }))
+            setLoadingComments(prev => ({ ...prev, [tripId]: false }))
+        }
+    }
+
+    const handlePostComment = async (tripId: string) => {
+        const text = newCommentText[tripId]
+        if (!text?.trim()) return
+
+        // Ideally pass real user ID. For now assuming backend handles it or we pass a placeholder if using mock auth
+        const userId = myTrips[0]?.userId || "00000000-0000-0000-0000-000000000000" // Fallback for MVP
+
+        await addComment(tripId, userId, text)
+
+        // Refresh comments
+        const comments = await getComments(tripId)
+        setCommentsData(prev => ({ ...prev, [tripId]: comments }))
+        setNewCommentText(prev => ({ ...prev, [tripId]: "" }))
+    }
+
     const filteredPosts = posts.filter(post =>
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         post.location?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -130,7 +179,6 @@ export default function CommunityPage() {
 
     return (
         <div className="flex flex-col h-screen bg-black text-white font-sans overflow-hidden">
-
             {/* --- Header --- */}
             <header className="flex items-center justify-between p-4 px-6 border-b border-white/10 bg-black/60 backdrop-blur-md shrink-0">
                 <div className="flex items-center gap-3">
@@ -180,15 +228,6 @@ export default function CommunityPage() {
 
             {/* --- Feed Content --- */}
             <div className="flex-1 overflow-auto p-6 max-w-3xl mx-auto w-full custom-scrollbar">
-                <div className="flex items-center gap-3 mb-6">
-                    <h2 className="text-2xl font-bold tracking-tight">Community Feed</h2>
-                    {filterBy === "Nearby" && (
-                        <span className="text-xs bg-indigo-500/20 text-indigo-300 px-2 py-1 rounded-full flex items-center gap-1 border border-indigo-500/30">
-                            <Navigation className="w-3 h-3" /> Near You
-                        </span>
-                    )}
-                </div>
-
                 <div className="flex flex-col gap-6 pb-20">
                     {isLoading && (
                         <div className="flex justify-center p-10"><Loader2 className="animate-spin text-white/50" /></div>
@@ -196,19 +235,21 @@ export default function CommunityPage() {
 
                     {!isLoading && filteredPosts.length === 0 && (
                         <div className="text-center p-10 text-white/30 border border-dashed border-white/10 rounded-xl">
-                            No trips found {filterBy === "Nearby" ? "near you." : "."}
+                            No trips found.
                         </div>
                     )}
 
                     {!isLoading && filteredPosts.map(post => (
                         <div key={post.id} className="flex gap-4 p-4 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm transition-all hover:bg-white/[0.05]">
                             <div className="shrink-0 pt-1">
-                                <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 text-indigo-200 font-bold text-lg">
-                                    {(post.author.firstName?.[0] || "U")}
+                                <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 text-indigo-200 font-bold text-lg overflow-hidden">
+                                    {post.author.avatarUrl ? (
+                                        <img src={post.author.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                    ) : (post.author.firstName?.[0] || "U")}
                                 </div>
                             </div>
 
-                            <div className="flex-1 flex flex-col gap-2">
+                            <div className="flex-1 flex flex-col gap-2 min-w-0">
                                 <div className="flex items-center justify-between">
                                     <div className="flex flex-col">
                                         <span className="font-semibold text-white/90">
@@ -218,14 +259,22 @@ export default function CommunityPage() {
                                             {format(new Date(post.createdAt), "MMM d")} • {post.location || "Unknown Location"}
                                         </span>
                                     </div>
-                                    <button className="text-xs font-medium text-indigo-400 border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 rounded-full">
-                                        View Itinerary
-                                    </button>
                                 </div>
 
                                 <div className="mt-2 p-4 rounded-xl bg-black/40 border border-white/5 group cursor-pointer">
                                     <h3 className="text-lg font-bold group-hover:text-indigo-300 transition-colors">{post.title}</h3>
                                     {post.description && <p className="text-sm text-white/60 mt-1">{post.description}</p>}
+
+                                    {/* Images Grid */}
+                                    {post.images && post.images.length > 0 && (
+                                        <div className="mt-3 grid grid-cols-3 gap-2">
+                                            {post.images.map((img, idx) => (
+                                                <div key={idx} className="aspect-square rounded-lg overflow-hidden border border-white/10 bg-white/5">
+                                                    <img src={img} alt={`Trip photo ${idx + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="flex items-center gap-6 mt-2 ml-1">
@@ -233,14 +282,76 @@ export default function CommunityPage() {
                                         onClick={() => handleLike(post.id)}
                                         className="flex items-center gap-1.5 text-white/40 hover:text-pink-400 transition-colors group"
                                     >
-                                        <Heart className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                        <Heart className={`w-4 h-4 ${post.likesCount > 0 ? "fill-current text-pink-500" : ""} group-hover:scale-110 transition-transform`} />
                                         <span className="text-xs">{post.likesCount} Likes</span>
                                     </button>
-                                    <button className="flex items-center gap-1.5 text-white/40 hover:text-blue-400 transition-colors">
+                                    <button
+                                        onClick={() => toggleComments(post.id)}
+                                        className={`flex items-center gap-1.5 transition-colors ${expandedComments[post.id] ? "text-blue-400" : "text-white/40 hover:text-blue-400"}`}
+                                    >
                                         <MessageCircle className="w-4 h-4" />
-                                        <span className="text-xs">Comment</span>
+                                        <span className="text-xs">
+                                            {commentsData[post.id]?.length || "Comment"}
+                                        </span>
                                     </button>
                                 </div>
+
+                                {/* Comments Section */}
+                                <AnimatePresence>
+                                    {expandedComments[post.id] && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: "auto", opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            className="overflow-hidden mt-3"
+                                        >
+                                            <div className="bg-white/[0.03] rounded-xl p-3 border border-white/5 flex flex-col gap-3">
+                                                {loadingComments[post.id] ? (
+                                                    <div className="flex justify-center py-2"><Loader2 className="w-4 h-4 animate-spin text-white/30" /></div>
+                                                ) : (
+                                                    <div className="flex flex-col gap-3 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+                                                        {commentsData[post.id]?.length === 0 ? (
+                                                            <div className="text-xs text-white/30 text-center py-2">No comments yet. Be the first!</div>
+                                                        ) : (
+                                                            commentsData[post.id]?.map(comment => (
+                                                                <div key={comment.id} className="flex gap-2 items-start">
+                                                                    <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-white/70">
+                                                                        {comment.user?.avatarUrl ? <img src={comment.user.avatarUrl} className="w-full h-full rounded-full object-cover" /> : (comment.user?.firstName?.[0] || "U")}
+                                                                    </div>
+                                                                    <div className="flex-1 bg-white/5 rounded-lg p-2 rounded-tl-none">
+                                                                        <div className="flex justify-between items-baseline mb-0.5">
+                                                                            <span className="text-xs font-semibold text-white/80">{comment.user?.firstName || "Unknown"}</span>
+                                                                            <span className="text-[10px] text-white/30">{format(new Date(comment.createdAt), "MMM d, h:mm a")}</span>
+                                                                        </div>
+                                                                        <p className="text-xs text-white/70 leading-relaxed">{comment.content}</p>
+                                                                    </div>
+                                                                </div>
+                                                            ))
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                <div className="flex gap-2 items-center mt-1 border-t border-white/5 pt-3">
+                                                    <input
+                                                        type="text"
+                                                        value={newCommentText[post.id] || ""}
+                                                        onChange={(e) => setNewCommentText(prev => ({ ...prev, [post.id]: e.target.value }))}
+                                                        placeholder="Write a comment..."
+                                                        className="flex-1 bg-black/40 border border-white/10 rounded-full px-3 py-1.5 text-xs text-white outline-none focus:border-white/30"
+                                                        onKeyDown={(e) => e.key === 'Enter' && handlePostComment(post.id)}
+                                                    />
+                                                    <button
+                                                        onClick={() => handlePostComment(post.id)}
+                                                        disabled={!newCommentText[post.id]?.trim()}
+                                                        className="p-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-full text-white transition-colors"
+                                                    >
+                                                        <Send className="w-3 h-3" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         </div>
                     ))}
@@ -255,14 +366,14 @@ export default function CommunityPage() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-[#0A0A0A] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden relative"
+                            className="bg-[#0A0A0A] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden relative flex flex-col max-h-[90vh]"
                         >
-                            <div className="p-4 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
+                            <div className="p-4 border-b border-white/10 flex justify-between items-center bg-white/[0.02] shrink-0">
                                 <h3 className="text-lg font-bold">Share your trip</h3>
                                 <button onClick={() => setIsModalOpen(false)} className="text-white/50 hover:text-white"><X className="w-5 h-5" /></button>
                             </div>
 
-                            <div className="p-6 flex flex-col gap-4">
+                            <div className="p-6 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
                                 <div>
                                     <label className="block text-sm font-medium text-white/60 mb-1">Select Trip</label>
                                     <select
@@ -286,7 +397,7 @@ export default function CommunityPage() {
                                         value={postLocation}
                                         onChange={(e) => {
                                             setPostLocation(e.target.value)
-                                            setPostLat(undefined) // Reset if typing new text
+                                            setPostLat(undefined)
                                             setPostLng(undefined)
                                         }}
                                     />
@@ -314,6 +425,31 @@ export default function CommunityPage() {
                                         value={postDescription}
                                         onChange={(e) => setPostDescription(e.target.value)}
                                     />
+                                </div>
+
+                                <div className="border border-white/10 rounded-xl p-3 bg-black/20">
+                                    <label className="block text-sm font-medium text-white/60 mb-2 flex items-center gap-2">
+                                        <ImageIcon className="w-4 h-4" /> Trip Photos
+                                    </label>
+                                    <ImageUploadZone
+                                        onUploadComplete={(urls) => setPostImages([...postImages, ...urls])}
+                                        maxFiles={5}
+                                    />
+                                    {postImages.length > 0 && (
+                                        <div className="mt-3 grid grid-cols-4 gap-2">
+                                            {postImages.map((src, i) => (
+                                                <div key={i} className="relative aspect-square rounded-md overflow-hidden border border-white/10">
+                                                    <img src={src} className="w-full h-full object-cover" />
+                                                    <button
+                                                        onClick={() => setPostImages(postImages.filter((_, idx) => idx !== i))}
+                                                        className="absolute top-0 right-0 p-0.5 bg-black/50 hover:bg-red-500 text-white"
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <button

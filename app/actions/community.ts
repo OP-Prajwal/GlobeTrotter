@@ -15,6 +15,7 @@ export type CommunityPost = {
     latitude: number | null
     longitude: number | null
     likesCount: number
+    images: string[] | null
     author: {
         firstName: string | null
         lastName: string | null
@@ -53,6 +54,7 @@ export async function getCommunityPosts(searchQuery: string = "", userLat?: numb
                 latitude: trips.latitude,
                 longitude: trips.longitude,
                 likesCount: trips.likesCount,
+                images: trips.images,
                 firstName: users.firstName,
                 lastName: users.lastName,
                 avatarUrl: users.avatarUrl
@@ -73,6 +75,7 @@ export async function getCommunityPosts(searchQuery: string = "", userLat?: numb
             latitude: row.latitude ? parseFloat(row.latitude) : null,
             longitude: row.longitude ? parseFloat(row.longitude) : null,
             likesCount: row.likesCount,
+            images: row.images,
             author: {
                 firstName: row.firstName,
                 lastName: row.lastName,
@@ -115,7 +118,7 @@ export async function getUserTripsForSharing() {
     }
 }
 
-export async function shareTrip(tripId: string, location: string, description: string, lat?: number, lng?: number) {
+export async function shareTrip(tripId: string, location: string, description: string, lat?: number, lng?: number, images?: string[]) {
     try {
         await db.update(trips)
             .set({
@@ -124,6 +127,7 @@ export async function shareTrip(tripId: string, location: string, description: s
                 description: description,
                 latitude: lat ? lat.toString() : null, // Store as decimal string
                 longitude: lng ? lng.toString() : null,
+                images: images || [],
                 createdAt: new Date()
             })
             .where(eq(trips.id, tripId))
