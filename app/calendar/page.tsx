@@ -19,6 +19,7 @@ import {
 } from "date-fns"
 import { getCalendarTrips, type CalendarTrip, type CalendarStop } from "@/app/actions/calendar"
 import { GlassDropdown } from "@/app/search/GlassDropdown"
+import AppHeader from "@/components/shared/AppHeader"
 
 const TRIP_GRADIENTS = [
     "from-blue-500 to-indigo-600",
@@ -253,26 +254,7 @@ export default function CalendarPage() {
             </AnimatePresence>
 
             {/* --- App Header --- */}
-            <header className="flex items-center justify-between p-4 px-6 border-b border-white/5 bg-black/60 backdrop-blur-xl shrink-0 z-30">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
-                        <MapPin className="w-4 h-4 text-indigo-400" />
-                    </div>
-                    <span className="text-lg font-bold tracking-tight text-white/90">GlobeTrotter</span>
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="relative group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
-                        <input
-                            type="text"
-                            placeholder="Find your adventure..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-white/5 border border-white/10 rounded-full py-1.5 pl-9 pr-4 text-sm focus:bg-white/10 focus:border-white/20 outline-none w-48 transition-all"
-                        />
-                    </div>
-                </div>
-            </header>
+            <AppHeader />
 
             <div className="flex flex-1 overflow-hidden relative">
                 {/* --- Sidebar Legend (Left) --- */}

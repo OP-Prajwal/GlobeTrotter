@@ -9,6 +9,7 @@ import { GlassDropdown } from "@/app/search/GlassDropdown"
 import { ImageUploadZone } from "@/app/components/ImageUploadZone"
 import { format } from "date-fns"
 import { motion, AnimatePresence } from "framer-motion"
+import AppHeader from "@/components/shared/AppHeader"
 
 // Comment Interface
 interface Comment {
@@ -187,17 +188,7 @@ export default function CommunityPage() {
     return (
         <div className="flex flex-col h-screen bg-black text-white font-sans overflow-hidden">
             {/* --- Header --- */}
-            <header className="flex items-center justify-between p-4 px-6 border-b border-white/10 bg-black/60 backdrop-blur-md shrink-0">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
-                        <MapPin className="w-4 h-4 text-white" />
-                    </div>
-                    <div className="text-xl font-bold tracking-tight">GlobeTrotter</div>
-                </div>
-                <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer">
-                    <User className="w-5 h-5 text-white/70" />
-                </div>
-            </header>
+            <AppHeader />
 
             {/* --- Controls --- */}
             <div className="flex flex-col sm:flex-row gap-4 p-4 px-6 border-b border-white/10 bg-transparent items-center justify-between shrink-0 relative z-10">

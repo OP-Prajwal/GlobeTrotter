@@ -2,6 +2,7 @@ import { ProfileHeader } from "@/components/profile/profile-header";
 import { TripsSection } from "@/components/profile/trips-section";
 import { getUserProfile, getUserTrips } from "@/lib/actions/profile";
 import { redirect } from "next/navigation";
+import AppHeader from "@/components/shared/AppHeader";
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +26,8 @@ export default async function ProfilePage() {
 
     return (
         <div className="min-h-screen bg-black text-foreground selection:bg-purple-500/30">
+            <AppHeader />
+
             {/* Ambient Background */}
             <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-950 via-black to-black -z-20" />
             <div className="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[100px] -z-10 mix-blend-screen animate-blob" />

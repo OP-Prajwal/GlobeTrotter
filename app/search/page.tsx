@@ -6,6 +6,7 @@ import { User, Search, Loader2, MapPin } from "lucide-react"
 import { searchDestinations } from "@/app/actions/destinations"
 import { searchActivities } from "@/app/actions/activities"
 import { GlassDropdown } from "./GlassDropdown"
+import AppHeader from "@/components/shared/AppHeader"
 
 // --- Types ---
 interface SearchItem {
@@ -90,17 +91,7 @@ export default function SearchScreen() {
     return (
         <div className="flex flex-col h-screen overflow-hidden font-sans bg-black text-white selection:bg-white/30">
             {/* --- Top Header Row --- */}
-            <header className="flex items-center justify-between p-4 border-b border-white/10 bg-black/70 backdrop-blur-md shrink-0">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
-                        <MapPin className="w-4 h-4 text-white" />
-                    </div>
-                    <div className="text-xl font-bold tracking-tight">GlobeTrotter</div>
-                </div>
-                <div className="flex items-center justify-center w-10 h-10 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm hover:bg-white/10 transition-colors cursor-pointer">
-                    <User className="w-5 h-5 text-white/80" />
-                </div>
-            </header>
+            <AppHeader />
 
             {/* --- Control Row --- */}
             <div className="flex gap-4 p-4 border-b border-white/10 shrink-0 bg-transparent items-center sticky top-0 z-10">
