@@ -1,4 +1,5 @@
 import { pgTable, text, timestamp, uuid, integer, jsonb, decimal } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
 
 export const users = pgTable('users', {
     id: uuid('id').primaryKey().defaultRandom(),
@@ -47,3 +48,32 @@ export const activities = pgTable('activities', {
     order: integer('order').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+// --- Relations ---
+
+export const usersRelations = relations(users, ({ many }) => ({
+    trips: many(trips),
+}));
+
+export const tripsRelations = relations(trips, ({ one, many }) => ({
+    user: one(users, {
+        fields: [trips.userId],
+        references: [users.id],
+    }),
+    stops: many(stops),
+}));
+
+export const stopsRelations = relations(stops, ({ one, many }) => ({
+    trip: one(trips, {
+        fields: [stops.tripId],
+        references: [trips.id],
+    }),
+    activities: many(activities),
+}));
+
+export const activitiesRelations = relations(activities, ({ one }) => ({
+    stop: one(stops, {
+        fields: [activities.stopId],
+        references: [stops.id],
+    }),
+}));
