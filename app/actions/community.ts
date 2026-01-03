@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db"
 import { trips, users } from "@/lib/db/schema"
-import { eq, desc, sql, and } from "drizzle-orm"
+import { eq, desc, sql, and, ne, or } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 
 export type CommunityPost = {
@@ -43,6 +43,17 @@ function deg2rad(deg: number) {
 
 export async function getCommunityPosts(searchQuery: string = "", userLat?: number, userLng?: number): Promise<CommunityPost[]> {
     try {
+        console.log("🔍 [DEBUG] Fetching community posts...")
+
+        // First, let's check ALL trips without filters
+        const allTrips = await db.select().from(trips).limit(10)
+        console.log("📊 [DEBUG] Total trips in DB (sample):", allTrips.length, allTrips.map(t => ({
+            id: t.id,
+            title: t.title,
+            isPublic: t.isPublic,
+            userId: t.userId
+        })))
+
         const results = await db
             .select({
                 tripId: trips.id,
@@ -55,6 +66,7 @@ export async function getCommunityPosts(searchQuery: string = "", userLat?: numb
                 longitude: trips.longitude,
                 likesCount: trips.likesCount,
                 images: trips.images,
+                isPublic: trips.isPublic,
                 firstName: users.firstName,
                 lastName: users.lastName,
                 avatarUrl: users.avatarUrl
@@ -63,7 +75,14 @@ export async function getCommunityPosts(searchQuery: string = "", userLat?: numb
             .leftJoin(users, eq(trips.userId, users.id))
             .where(eq(trips.isPublic, true))
             .orderBy(desc(trips.createdAt))
-            .limit(50) // Fetch more to filter locally for proximity
+            .limit(50)
+
+        console.log("🔎 [DEBUG] Query results:", results.length, results.map(r => ({
+            id: r.tripId,
+            title: r.title,
+            isPublic: r.isPublic,
+            firstName: r.firstName
+        })))
 
         let posts = results.map(row => ({
             id: row.tripId,
@@ -101,6 +120,7 @@ export async function getCommunityPosts(searchQuery: string = "", userLat?: numb
             posts = postsWithDistance
         }
 
+        console.log("Community posts found:", posts.length, posts)
         return posts
 
     } catch (error) {
@@ -120,18 +140,22 @@ export async function getUserTripsForSharing() {
 
 export async function shareTrip(tripId: string, location: string, description: string, lat?: number, lng?: number, images?: string[]) {
     try {
-        await db.update(trips)
+        console.log("Sharing trip:", { tripId, location, description, lat, lng, images })
+
+        const result = await db.update(trips)
             .set({
-                isPublic: true,
+                isPublic: true, // This marks it as shared to community
                 location: location,
                 description: description,
-                latitude: lat ? lat.toString() : null, // Store as decimal string
+                latitude: lat ? lat.toString() : null,
                 longitude: lng ? lng.toString() : null,
-                images: images || [],
-                createdAt: new Date()
+                images: images || [], // Store images array
+                createdAt: new Date() // Update timestamp to show as recent post
             })
             .where(eq(trips.id, tripId))
+            .returning()
 
+        console.log("Share result:", result)
         revalidatePath("/community")
         return { success: true }
     } catch (error) {

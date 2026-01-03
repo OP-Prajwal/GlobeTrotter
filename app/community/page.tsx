@@ -19,7 +19,7 @@ interface Comment {
         firstName: string | null
         lastName: string | null
         avatarUrl: string | null
-    }
+    } | null
 }
 
 export default function CommunityPage() {
@@ -52,7 +52,9 @@ export default function CommunityPage() {
     const [loadingComments, setLoadingComments] = useState<Record<string, boolean>>({})
 
     async function loadPosts(lat?: number, lng?: number) {
+        console.log("Loading posts with coords:", lat, lng)
         const data = await getCommunityPosts("", lat, lng)
+        console.log("Posts loaded:", data.length, data)
         setPosts(data)
     }
 
@@ -122,9 +124,14 @@ export default function CommunityPage() {
     }
 
     const handleShare = async () => {
-        if (!selectedTripId) return
+        if (!selectedTripId) {
+            console.log("No trip selected")
+            return
+        }
+        console.log("Starting share process for trip:", selectedTripId)
         setIsPosting(true)
-        await shareTrip(selectedTripId, postLocation, postDescription, postLat, postLng, postImages)
+        const result = await shareTrip(selectedTripId, postLocation, postDescription, postLat, postLng, postImages)
+        console.log("Share completed, result:", result)
         await loadPosts()
         setIsPosting(false)
         setIsModalOpen(false)

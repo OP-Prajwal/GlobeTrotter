@@ -1,10 +1,9 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { ChevronDown, Check } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 
-interface Option {
+interface DropdownOption {
     label: string
     value: string
 }
@@ -12,18 +11,17 @@ interface Option {
 interface GlassDropdownProps {
     label: string
     value: string
-    options: Option[]
     onChange: (value: string) => void
+    options: DropdownOption[]
 }
 
-export function GlassDropdown({ label, value, options, onChange }: GlassDropdownProps) {
+export function GlassDropdown({ label, value, onChange, options }: GlassDropdownProps) {
     const [isOpen, setIsOpen] = useState(false)
-    const containerRef = useRef<HTMLDivElement>(null)
+    const dropdownRef = useRef<HTMLDivElement>(null)
 
-    // Close when clicking outside
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsOpen(false)
             }
         }
@@ -31,56 +29,38 @@ export function GlassDropdown({ label, value, options, onChange }: GlassDropdown
         return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [])
 
-    const selectedLabel = options.find((opt) => opt.value === value)?.label || value
+    const selectedOption = options.find(opt => opt.value === value)
 
     return (
-        <div ref={containerRef} className="relative z-50">
-            <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-white/60 hidden sm:inline-block">{label}:</span>
+        <div ref={dropdownRef} className="relative">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="flex items-center gap-2 px-4 py-2 bg-black/60 border border-white/10 rounded-lg hover:bg-black/80 hover:border-white/20 transition-all text-white text-sm font-medium backdrop-blur-sm"
+            >
+                <span className="text-white/50 text-xs">{label}:</span>
+                <span>{selectedOption?.label || value}</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+            </button>
 
-                <motion.button
-                    whileHover={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setIsOpen(!isOpen)}
-                    className={`flex items-center gap-2 px-3 py-2 text-sm text-white bg-black/40 border transition-colors rounded-lg outline-none min-w-[140px] justify-between ${isOpen ? "border-white/40" : "border-white/10"
-                        }`}
-                >
-                    <span className="truncate">{selectedLabel}</span>
-                    <motion.div
-                        animate={{ rotate: isOpen ? 180 : 0 }}
-                        transition={{ duration: 0.2 }}
-                    >
-                        <ChevronDown className="w-4 h-4 text-white/50" />
-                    </motion.div>
-                </motion.button>
-            </div>
-
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        transition={{ duration: 0.15, ease: "easeOut" }}
-                        className="absolute right-0 mt-2 w-48 bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden py-1 z-50 origin-top-right"
-                    >
-                        {options.map((option) => (
-                            <button
-                                key={option.value}
-                                onClick={() => {
-                                    onChange(option.value)
-                                    setIsOpen(false)
-                                }}
-                                className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors hover:bg-white/10 ${option.value === value ? "text-white bg-white/5" : "text-white/70"
-                                    }`}
-                            >
-                                {option.label}
-                                {option.value === value && <Check className="w-3.5 h-3.5 text-white" />}
-                            </button>
-                        ))}
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {isOpen && (
+                <div className="absolute top-full mt-2 right-0 min-w-[200px] bg-black border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50 backdrop-blur-xl">
+                    {options.map((option) => (
+                        <button
+                            key={option.value}
+                            onClick={() => {
+                                onChange(option.value)
+                                setIsOpen(false)
+                            }}
+                            className={`w-full text-left px-4 py-3 text-sm transition-colors ${option.value === value
+                                ? "bg-indigo-600/20 text-indigo-300 font-medium"
+                                : "text-white/70 hover:bg-white/5 hover:text-white"
+                                }`}
+                        >
+                            {option.label}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
     )
 }

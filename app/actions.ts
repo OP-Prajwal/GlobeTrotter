@@ -26,7 +26,7 @@ export async function createTrip(formData: FormData) {
             const newUser = await db.insert(users).values({
                 email: "demo@example.com",
                 supabaseId: "demo-user-" + Math.random(), // Unique dummy ID
-                firstName: "Demo",
+                firstName: "Traveler",
                 lastName: "User"
             }).returning({ id: users.id });
             userId = newUser[0].id;
