@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, integer, jsonb, decimal } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, integer, jsonb, decimal, boolean } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
     id: uuid('id').primaryKey().defaultRandom(),
@@ -19,6 +19,11 @@ export const trips = pgTable('trips', {
     startDate: timestamp('start_date'),
     endDate: timestamp('end_date'),
     budget: decimal('budget', { precision: 10, scale: 2 }), // User's set budget
+    isPublic: boolean('is_public').default(true).notNull(), // Shared in community
+    location: text('location'), // e.g. "Paris, France"
+    latitude: decimal('latitude', { precision: 10, scale: 6 }),
+    longitude: decimal('longitude', { precision: 10, scale: 6 }),
+    likesCount: integer('likes_count').default(0).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
