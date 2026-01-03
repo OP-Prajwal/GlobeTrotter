@@ -24,6 +24,8 @@ export const trips = pgTable('trips', {
     latitude: decimal('latitude', { precision: 10, scale: 6 }),
     longitude: decimal('longitude', { precision: 10, scale: 6 }),
     likesCount: integer('likes_count').default(0).notNull(),
+    // Images array for Cloudinary
+    images: text('images').array(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -50,5 +52,13 @@ export const activities = pgTable('activities', {
     cost: decimal('cost', { precision: 10, scale: 2 }), // For budget calculation
     category: text('category'), // e.g., 'food', 'action', 'stay'
     order: integer('order').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const comments = pgTable('comments', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    tripId: uuid('trip_id').references(() => trips.id, { onDelete: 'cascade' }).notNull(),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+    content: text('content').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
