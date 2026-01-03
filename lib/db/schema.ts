@@ -19,7 +19,7 @@ export const trips = pgTable('trips', {
     startDate: timestamp('start_date'),
     endDate: timestamp('end_date'),
     budget: decimal('budget', { precision: 10, scale: 2 }), // User's set budget
-    isPublic: boolean('is_public').default(true).notNull(), // Shared in community
+    isPublic: boolean('is_public').default(false).notNull(), // Shared in community
     location: text('location'), // e.g. "Paris, France"
     latitude: decimal('latitude', { precision: 10, scale: 6 }),
     longitude: decimal('longitude', { precision: 10, scale: 6 }),

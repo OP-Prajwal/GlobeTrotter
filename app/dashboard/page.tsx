@@ -4,6 +4,8 @@ import Link from "next/link"
 import RegionalDiscovery from "@/components/dashboard/regional-discovery"
 import DashboardHeader from "@/components/dashboard/dashboard-header"
 
+export const dynamic = 'force-dynamic';
+
 export default async function Dashboard() {
     const supabase = await createClient()
 

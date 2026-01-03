@@ -40,6 +40,7 @@ export async function createTrip(formData: FormData) {
             endDate: endDate ? new Date(endDate) : null,
             budget: "0", // Default budget
             userId: userId,
+            isPublic: false,
             // coverPhoto: coverPhoto // Schema doesn't have this yet, so we can't save it.
         });
 

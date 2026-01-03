@@ -5,7 +5,7 @@ import { db } from "@/lib/db"
 import { users, trips } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 
-export async function getTrips() {
+export async function getTrips(): Promise<any[]> {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 

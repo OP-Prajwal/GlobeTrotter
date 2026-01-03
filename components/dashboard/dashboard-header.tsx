@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, Calendar, Map, Activity, Search, User } from "lucide-react"
+import { Menu, X, Calendar, Map, Activity, Search, User, Users } from "lucide-react"
 
 interface DashboardHeaderProps {
     userEmail?: string | null
@@ -11,7 +11,8 @@ interface DashboardHeaderProps {
 
 const MENU_ITEMS = [
     { label: "Calendar", href: "/calendar", icon: Calendar },
-    { label: "All Trips", href: "/my-trips", icon: Map },
+    { label: "My Trips", href: "/trips", icon: Map },
+    { label: "Community", href: "/community", icon: Users },
     { label: "Activity", href: "/search?filter=Activity", icon: Activity },
     { label: "City Search", href: "/search?filter=City", icon: Search },
 ]

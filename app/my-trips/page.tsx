@@ -1,5 +1,6 @@
 import React from "react";
 import { db } from "@/lib/db";
+export const dynamic = 'force-dynamic';
 import { trips } from "@/lib/db/schema";
 import { desc } from "drizzle-orm";
 import { Calendar, DollarSign, MapPin } from "lucide-react";
@@ -7,7 +8,7 @@ import Link from "next/link";
 
 export default async function MyTrips() {
     // Fetch trips from DB
-    let allTrips = [];
+    let allTrips: any[] = [];
     try {
         allTrips = await db.select().from(trips).orderBy(desc(trips.createdAt));
     } catch (error) {

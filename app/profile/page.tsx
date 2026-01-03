@@ -3,6 +3,8 @@ import { TripsSection } from "@/components/profile/trips-section";
 import { getUserProfile, getUserTrips } from "@/lib/actions/profile";
 import { redirect } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProfilePage() {
     const profile = await getUserProfile();
     const trips = await getUserTrips();
