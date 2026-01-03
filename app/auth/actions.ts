@@ -5,7 +5,24 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { LoginValues, SignupValues } from '@/lib/validations/auth'
 
+import { checkAdminCredentials } from '@/lib/utils/admin-validation'
+import { getAdminCookieStore } from '@/lib/actions/admin-auth'
+
 export async function login(data: LoginValues) {
+    // 1. Check for Admin Login first
+    // Use the email field as the username for admin login
+    if (checkAdminCredentials(data.email, data.password)) {
+        const cookieStore = await getAdminCookieStore()
+        cookieStore.set('admin_session', 'true', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 60 * 60 * 24,
+            path: '/',
+        })
+        redirect('/admin/dashboard')
+    }
+
+    // 2. Proceed with regular user login
     const supabase = await createClient()
 
     const { error } = await supabase.auth.signInWithPassword(data)
