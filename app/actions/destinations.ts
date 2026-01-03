@@ -6,6 +6,8 @@ interface SearchItem {
     type: "City"
     category: string
     details: string
+    latitude?: number
+    longitude?: number
 }
 
 export async function searchDestinations(query: string): Promise<SearchItem[]> {
@@ -43,6 +45,8 @@ export async function searchDestinations(query: string): Promise<SearchItem[]> {
             type: "City",
             category: city.country,
             details: `${city.region || ''}, ${city.country}`,
+            latitude: city.latitude,
+            longitude: city.longitude
         }))
 
     } catch (error) {
