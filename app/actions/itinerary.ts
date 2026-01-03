@@ -32,9 +32,9 @@ export async function saveItinerary(tripId: string, sections: any[]) {
             order: index,
             locationName: section.title || "Untitled Section",
             description: section.notes || "",
-            // Parse dates only if they exist
-            startDate: section.startDate ? new Date(section.startDate) : null,
-            endDate: section.endDate ? new Date(section.endDate) : null,
+            // Parse dates only if they exist - map to schema fields arrivalDate/departureDate
+            arrivalDate: section.startDate ? new Date(section.startDate) : null,
+            departureDate: section.endDate ? new Date(section.endDate) : null,
             // Budget is a string in frontend ("123"), needs to be decimal/number or handled by DB
             budget: section.budget || "0",
             // Lat/Lon are required by schema but we don't have them yet. default to 0.
@@ -51,5 +51,26 @@ export async function saveItinerary(tripId: string, sections: any[]) {
     } catch (error) {
         console.error("Failed to save itinerary:", error)
         return { success: false, error: "Failed to save itinerary" }
+    }
+}
+
+export async function getItinerary(tripId: string) {
+    try {
+        const tripStops = await db.query.stops.findMany({
+            where: eq(stops.tripId, tripId),
+            orderBy: (stops, { asc }) => [asc(stops.order)],
+        });
+
+        return tripStops.map(stop => ({
+            id: stop.id,
+            title: stop.locationName,
+            notes: stop.description || "",
+            startDate: stop.arrivalDate ? stop.arrivalDate.toISOString().split('T')[0] : "",
+            endDate: stop.departureDate ? stop.departureDate.toISOString().split('T')[0] : "",
+            budget: stop.budget?.toString() || "",
+        }));
+    } catch (error) {
+        console.error("Failed to fetch itinerary:", error);
+        return [];
     }
 }
