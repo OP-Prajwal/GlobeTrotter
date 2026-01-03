@@ -28,6 +28,8 @@ export const stops = pgTable('stops', {
     tripId: uuid('trip_id').references(() => trips.id, { onDelete: 'cascade' }).notNull(),
     order: integer('order').notNull(), // For drag-and-drop reordering
     locationName: text('location_name').notNull(),
+    description: text('description'), // Notes for the section
+    budget: decimal('budget', { precision: 10, scale: 2 }),
     latitude: decimal('latitude', { precision: 10, scale: 6 }),
     longitude: decimal('longitude', { precision: 10, scale: 6 }),
     arrivalDate: timestamp('arrival_date'),
