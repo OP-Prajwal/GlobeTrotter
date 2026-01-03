@@ -67,7 +67,9 @@ export default async function MyTrips() {
                                             <span>Destination</span>
                                         </div>
                                         <div className="text-white/90 font-semibold">
-                                            {trip.budget ? `$${trip.budget}` : "No Budget"}
+                                            {(Number(trip.budget) > 0)
+                                                ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(trip.budget))
+                                                : "No Budget"}
                                         </div>
                                     </div>
 

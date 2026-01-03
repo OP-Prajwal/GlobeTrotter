@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { User, MapPin } from "lucide-react"
 import { getBudgetOverview, type BudgetOverviewData } from "@/app/actions/budget"
+import AppHeader from "@/components/shared/AppHeader"
 import { BudgetOverview } from "@/app/components/budget/BudgetOverview"
 import { TimeNavigator } from "@/app/components/budget/TimeNavigator"
 import { TripList } from "@/app/components/budget/TripList"
@@ -33,17 +34,7 @@ export default function BudgetPage() {
     return (
         <div className="flex flex-col h-screen bg-[#050505] text-white font-sans overflow-hidden selection:bg-indigo-500/30">
             {/* Header */}
-            <header className="flex items-center justify-between p-4 px-6 border-b border-white/10 bg-black/60 backdrop-blur-md shrink-0">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
-                        <MapPin className="w-4 h-4 text-white" />
-                    </div>
-                    <span className="text-xl font-bold tracking-tight text-white">GlobeTrotter</span>
-                </div>
-                <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer">
-                    <User className="w-5 h-5 text-white/70" />
-                </div>
-            </header>
+            <AppHeader />
 
             <main className="flex-1 overflow-y-auto custom-scrollbar p-6">
                 <div className="max-w-6xl mx-auto pb-20">
