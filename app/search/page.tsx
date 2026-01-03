@@ -1,5 +1,6 @@
 "use client"
 
+import { useSearchParams } from "next/navigation"
 import { useState, useMemo, useEffect } from "react"
 import { User, Search, Loader2, MapPin } from "lucide-react"
 import { searchDestinations } from "@/app/actions/destinations"
@@ -16,11 +17,14 @@ interface SearchItem {
 }
 
 export default function SearchScreen() {
+    const searchParams = useSearchParams()
+    const initialFilter = searchParams.get("filter") as "City" | "Activity" | "Attraction" | null
+
     const [query, setQuery] = useState("")
     const [results, setResults] = useState<SearchItem[]>([])
     const [isLoading, setIsLoading] = useState(false)
 
-    const [filterType, setFilterType] = useState<"All" | "City" | "Activity" | "Attraction">("All")
+    const [filterType, setFilterType] = useState<"All" | "City" | "Activity" | "Attraction">(initialFilter && ["City", "Activity", "Attraction"].includes(initialFilter) ? initialFilter : "All")
     const [groupBy, setGroupBy] = useState<"None" | "Type" | "Category">("None")
     const [sortBy, setSortBy] = useState<"NameAsc" | "NameDesc">("NameAsc")
 

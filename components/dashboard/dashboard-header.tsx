@@ -11,9 +11,9 @@ interface DashboardHeaderProps {
 
 const MENU_ITEMS = [
     { label: "Calendar", href: "/calendar", icon: Calendar },
-    { label: "All Trips", href: "/trips", icon: Map },
-    { label: "Activity", href: "/activity", icon: Activity },
-    { label: "City Search", href: "/search", icon: Search },
+    { label: "All Trips", href: "/my-trips", icon: Map },
+    { label: "Activity", href: "/search?filter=Activity", icon: Activity },
+    { label: "City Search", href: "/search?filter=City", icon: Search },
 ]
 
 export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
