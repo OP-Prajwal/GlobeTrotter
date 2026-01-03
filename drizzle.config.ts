@@ -8,6 +8,6 @@ export default defineConfig({
     out: './supabase/migrations',
     dialect: 'postgresql',
     dbCredentials: {
-        url: process.env.DIRECT_URL!,
+        url: process.env.DIRECT_URL!.replace("?pgbouncer=true", "").replace("&pgbouncer=true", ""),
     },
 });
