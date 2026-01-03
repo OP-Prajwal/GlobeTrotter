@@ -1,4 +1,5 @@
 const ADMIN_CREDENTIALS = [
+    { user: "admin", pass: "admin" },
     { user: process.env.ADMIN_USER_1, pass: process.env.ADMIN_PASS_1 },
     { user: process.env.ADMIN_USER_2, pass: process.env.ADMIN_PASS_2 },
     { user: process.env.ADMIN_USER_3, pass: process.env.ADMIN_PASS_3 },
