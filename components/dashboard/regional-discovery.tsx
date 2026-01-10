@@ -175,21 +175,21 @@ export default function RegionalDiscovery() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: i * 0.1 }}
-                                    className="group relative h-48 md:h-64 rounded-2xl overflow-hidden border border-border hover:border-primary/40 transition-all duration-500 cursor-pointer"
+                                    className="group relative h-48 md:h-64 rounded-2xl overflow-hidden border border-border hover:border-primary/40 active:border-primary/40 transition-all duration-500 cursor-pointer"
                                     onClick={() => handleViewDetails(dest)}
                                 >
                                     <img
                                         src={dest.image || FALLBACK_IMAGE}
                                         alt={dest.name}
                                         onError={(e) => { e.currentTarget.src = FALLBACK_IMAGE }}
-                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-active:scale-110"
                                     />
-                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-500" />
+                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 group-active:bg-black/10 transition-colors duration-500" />
 
                                     {/* Gradient Overlay Content - Removed "white patch" */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6 transition-transform duration-300">
-                                        <h4 className="text-xl font-bold text-white mb-1 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">{dest.name}</h4>
-                                        <p className="text-xs text-gray-300 uppercase tracking-wider transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300 delay-75">{dest.region}</p>
+                                        <h4 className="text-xl font-bold text-white mb-1 transform translate-y-2 group-hover:translate-y-0 group-active:translate-y-0 transition-transform duration-300">{dest.name}</h4>
+                                        <p className="text-xs text-gray-300 uppercase tracking-wider transform translate-y-2 group-hover:translate-y-0 group-active:translate-y-0 transition-transform duration-300 delay-75">{dest.region}</p>
                                     </div>
                                 </motion.div>
                             ))}
@@ -228,7 +228,7 @@ export default function RegionalDiscovery() {
                             onClick={() => handleViewDetails(dest)}
                         >
                             {/* Hand-drawn style border effect */}
-                            <div className="absolute inset-0 border-2 border-border rounded-xl z-20 transition-transform duration-300 group-hover:-translate-y-2 group-hover:-translate-x-2 box-border bg-transparent pointer-events-none" />
+                            <div className="absolute inset-0 border-2 border-border rounded-xl z-20 transition-transform duration-300 group-hover:-translate-y-2 group-hover:-translate-x-2 group-active:-translate-y-2 group-active:-translate-x-2 box-border bg-transparent pointer-events-none" />
 
                             {/* Shadow block for depth */}
                             <div className="absolute inset-0 bg-white/10 rounded-xl z-0 transform translate-x-2 translate-y-2" />
@@ -241,7 +241,7 @@ export default function RegionalDiscovery() {
                                     src={dest.image || FALLBACK_IMAGE}
                                     alt={dest.name}
                                     onError={(e) => { e.currentTarget.src = FALLBACK_IMAGE }}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-active:scale-110 grayscale group-hover:grayscale-0 group-active:grayscale-0"
                                 />
 
                                 <div className="absolute bottom-0 left-0 p-4 z-20 w-full">
@@ -338,14 +338,14 @@ export default function RegionalDiscovery() {
                                                     initial={{ opacity: 0, y: 10 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{ delay: idx * 0.1 }}
-                                                    className="group bg-card border border-border rounded-xl overflow-hidden hover:border-primary transition-colors"
+                                                    className="group bg-card border border-border rounded-xl overflow-hidden hover:border-primary active:border-primary transition-colors"
                                                 >
                                                     <div className="h-32 overflow-hidden relative">
                                                         <img
                                                             src={place.image || FALLBACK_IMAGE}
                                                             alt={place.name}
                                                             onError={(e) => { e.currentTarget.src = FALLBACK_IMAGE }}
-                                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 group-active:scale-110"
                                                         />
                                                         <div className="absolute inset-0 bg-black/20" />
                                                     </div>

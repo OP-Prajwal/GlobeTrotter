@@ -125,13 +125,13 @@ export default function CreateTrip() {
                     ) : coverPhoto && !coverPhoto.startsWith('linear-gradient') ? (
                       <>
                         <img src={coverPhoto} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity">
                           <Upload className="w-8 h-8 text-white mb-2" />
                         </div>
                       </>
                     ) : (
                       <>
-                        <Upload className="w-8 h-8 text-white/60 mb-2 group-hover:text-white group-hover:scale-110 transition-all" />
+                        <Upload className="w-8 h-8 text-white/60 mb-2 group-hover:text-white group-active:text-white group-hover:scale-110 group-active:scale-110 transition-all" />
                         <span className="text-sm text-white/60 group-hover:text-white transition-colors">Click to upload or drag & drop</span>
                       </>
                     )}
@@ -183,7 +183,7 @@ export default function CreateTrip() {
                         <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
                           <span className="text-xs font-medium text-white">{place.name}</span>
                         </div>
-                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity">
                           <div className="bg-white/20 backdrop-blur-md p-1 rounded-full">
                             <Plus className="w-3 h-3 text-white" />
                           </div>
