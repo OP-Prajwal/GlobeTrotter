@@ -71,6 +71,11 @@ export default function RegionalDiscovery() {
                 console.error(error)
                 setError("Location permission denied. Showing global favorites.")
                 setLoading(false)
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
             }
         )
     }
