@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, integer, jsonb, decimal, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, integer, jsonb, decimal, boolean, unique } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const users = pgTable('users', {
@@ -9,6 +9,8 @@ export const users = pgTable('users', {
     lastName: text('last_name'),
     avatarUrl: text('avatar_url'),
     bio: text('bio'),
+    lastLatitude: decimal('last_latitude', { precision: 10, scale: 6 }),
+    lastLongitude: decimal('last_longitude', { precision: 10, scale: 6 }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -63,6 +65,15 @@ export const comments = pgTable('comments', {
     content: text('content').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+export const likes = pgTable('likes', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+    tripId: uuid('trip_id').references(() => trips.id, { onDelete: 'cascade' }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (t) => ({
+    unq: unique().on(t.userId, t.tripId),
+}));
 
 // --- Relations ---
 

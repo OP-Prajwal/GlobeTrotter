@@ -6,12 +6,15 @@ import { Calendar, MapPin, Upload, Plus, Save } from "lucide-react";
 import AppHeader from "@/components/shared/AppHeader";
 
 import { createTrip } from "../actions";
+import { uploadImageAction } from "@/app/actions/image-upload";
 
 export default function CreateTrip() {
   const [tripName, setTripName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [description, setDescription] = useState("");
+  const [coverPhoto, setCoverPhoto] = useState("linear-gradient(to bottom right, #ff9a9e, #fecfef)");
+  const [isUploading, setIsUploading] = useState(false);
 
   const suggestedPlaces = [
     { id: 1, name: "Kyoto, Japan", image: "linear-gradient(to bottom right, #ff9a9e, #fecfef)" },
@@ -24,7 +27,7 @@ export default function CreateTrip() {
     <div className="min-h-screen bg-black text-white">
       <AppHeader />
 
-      <div className="w-full flex items-center justify-center p-8 relative overflow-hidden">
+      <div className="w-full flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
         {/* Background Gradients */}
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-600/30 blur-[120px]" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/30 blur-[120px]" />
@@ -34,7 +37,7 @@ export default function CreateTrip() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl w-full max-w-6xl p-8 md:p-12 relative z-10"
+          className="bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl w-full max-w-6xl p-6 md:p-12 relative z-10"
         >
           <header className="mb-8 text-center">
             <h1 className="text-4xl font-bold text-white tracking-tight mb-2 drop-shadow-lg">
@@ -108,10 +111,58 @@ export default function CreateTrip() {
               <div className="space-y-6 flex flex-col">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white/80 ml-1">Cover Photo</label>
-                  <input type="hidden" name="coverPhoto" value="linear-gradient(to bottom right, #ff9a9e, #fecfef)" />
-                  <div className="border-dashed border-2 border-white/20 rounded-xl h-40 flex flex-col items-center justify-center cursor-pointer hover:bg-white/10 transition-colors group bg-white/5">
-                    <Upload className="w-8 h-8 text-white/60 mb-2 group-hover:text-white group-hover:scale-110 transition-all" />
-                    <span className="text-sm text-white/60 group-hover:text-white transition-colors">Click to upload or drag & drop</span>
+                  <input type="hidden" name="coverPhoto" value={coverPhoto} />
+
+                  <div
+                    onClick={() => document.getElementById('file-upload')?.click()}
+                    className="relative border-dashed border-2 border-white/20 rounded-xl h-40 flex flex-col items-center justify-center cursor-pointer hover:bg-white/10 transition-colors group bg-white/5 overflow-hidden"
+                  >
+                    {isUploading ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-sm text-white/60">Uploading...</span>
+                      </div>
+                    ) : coverPhoto && !coverPhoto.startsWith('linear-gradient') ? (
+                      <>
+                        <img src={coverPhoto} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Upload className="w-8 h-8 text-white mb-2" />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-8 h-8 text-white/60 mb-2 group-hover:text-white group-hover:scale-110 transition-all" />
+                        <span className="text-sm text-white/60 group-hover:text-white transition-colors">Click to upload or drag & drop</span>
+                      </>
+                    )}
+
+                    <input
+                      id="file-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+
+                        setIsUploading(true);
+                        const formData = new FormData();
+                        formData.append("file", file);
+
+                        try {
+                          const result = await uploadImageAction(formData);
+                          if (result.success && result.url) {
+                            setCoverPhoto(result.url);
+                          } else {
+                            console.error("Upload failed");
+                          }
+                        } catch (err) {
+                          console.error("Error uploading photo", err);
+                        } finally {
+                          setIsUploading(false);
+                        }
+                      }}
+                    />
                   </div>
                 </div>
 
@@ -125,6 +176,7 @@ export default function CreateTrip() {
                         style={{ background: place.image }}
                         onClick={() => {
                           setTripName(place.name);
+                          setCoverPhoto(place.image);
                         }}
                       >
                         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors" />

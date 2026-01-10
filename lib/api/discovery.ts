@@ -133,6 +133,12 @@ export async function getDestinationImage(query: string): Promise<string> {
         const response = await fetch(
             `https://api.unsplash.com/photos/random?query=${encodeURIComponent(query + ' travel')}&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`
         );
+
+        if (!response.ok) {
+            console.warn(`Unsplash API Error: ${response.status} ${response.statusText}`);
+            return getRandomFallback();
+        }
+
         const data = await response.json();
         return data.urls?.regular || getRandomFallback();
     } catch (error) {

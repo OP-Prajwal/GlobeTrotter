@@ -16,7 +16,7 @@ export default async function Dashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-black text-white selection:bg-purple-500/30">
+        <div className="min-h-screen bg-background text-foreground selection:bg-purple-500/30">
 
             {/* Interactive Header with Hamburger Menu */}
             <AppHeader userEmail={user.email} />
@@ -28,11 +28,7 @@ export default async function Dashboard() {
                 </section>
 
                 {/* Placeholder for future sections */}
-                <div className="max-w-7xl mx-auto px-8">
-                    <div className="p-6 border-2 border-dashed border-white/10 rounded-2xl text-center">
-                        <p className="text-gray-500">Upcoming: My Trips & Itinerary Planner</p>
-                    </div>
-                </div>
+
             </main>
         </div>
     )

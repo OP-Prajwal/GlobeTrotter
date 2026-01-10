@@ -12,12 +12,31 @@ export async function getUserProfile() {
 
     if (!user) return null
 
-    // Try to find user in DB
-    const dbUser = await db.query.users.findFirst({
+    // Try to find user in DB by Supabase ID
+    let dbUser = await db.query.users.findFirst({
         where: eq(users.supabaseId, user.id)
     })
 
     if (dbUser) return dbUser
+
+    // If not found by ID, check if email exists (e.g. from previous seed or broken link)
+    // and link the accounts if so.
+    const existingUserByEmail = await db.query.users.findFirst({
+        where: eq(users.email, user.email!)
+    })
+
+    if (existingUserByEmail) {
+        // Update the existing user with the new Supabase ID to re-link them
+        const updatedUser = await db.update(users)
+            .set({
+                supabaseId: user.id,
+                avatarUrl: user.user_metadata?.avatar_url || existingUserByEmail.avatarUrl, // Optional: update avatar too
+            })
+            .where(eq(users.id, existingUserByEmail.id))
+            .returning();
+
+        return updatedUser[0];
+    }
 
     // If not found, create them based on Auth metadata (Lazy Sync)
     // This handles cases where signup didn't sync or it's a legacy user

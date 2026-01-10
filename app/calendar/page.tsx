@@ -53,7 +53,7 @@ export default function CalendarPage() {
     const [selectedTrip, setSelectedTrip] = useState<CalendarTrip | null>(null)
 
     // View Controls
-    const [showLegend, setShowLegend] = useState(true)
+    const [showLegend, setShowLegend] = useState(false)
     const [groupBy, setGroupBy] = useState("None")
     const [filterBy, setFilterBy] = useState("All")
     const [sortBy, setSortBy] = useState("Date")
@@ -342,77 +342,79 @@ export default function CalendarPage() {
                             ))}
                         </div>
 
-                        <div className="flex-1 relative overflow-hidden">
-                            <AnimatePresence initial={false} custom={direction} mode="popLayout">
-                                <motion.div
-                                    key={format(currentDate, "yyyy-MM")}
-                                    custom={direction}
-                                    variants={variants}
-                                    initial="enter"
-                                    animate="center"
-                                    exit="exit"
-                                    className="grid grid-cols-7 w-full h-full absolute inset-0 grid-rows-6"
-                                >
-                                    {calendarDays.map((day) => {
-                                        const items = getItemsForDay(day)
-                                        const isCurrentMonth = isSameMonth(day, monthStart)
-                                        const isToday = isSameDay(day, new Date())
-                                        const activeTripsOnDay = filteredTrips.filter(t => isTripActiveOnDay(day, t));
+                        <div className="flex-1 relative overflow-hidden overflow-x-auto hide-scrollbar">
+                            <div className="min-w-[800px] h-full flex flex-col">
+                                <AnimatePresence initial={false} custom={direction} mode="popLayout">
+                                    <motion.div
+                                        key={format(currentDate, "yyyy-MM")}
+                                        custom={direction}
+                                        variants={variants}
+                                        initial="enter"
+                                        animate="center"
+                                        exit="exit"
+                                        className="grid grid-cols-7 w-full h-full absolute inset-0 grid-rows-6"
+                                    >
+                                        {calendarDays.map((day) => {
+                                            const items = getItemsForDay(day)
+                                            const isCurrentMonth = isSameMonth(day, monthStart)
+                                            const isToday = isSameDay(day, new Date())
+                                            const activeTripsOnDay = filteredTrips.filter(t => isTripActiveOnDay(day, t));
 
-                                        return (
-                                            <div
-                                                key={day.toString()}
-                                                className={`
+                                            return (
+                                                <div
+                                                    key={day.toString()}
+                                                    className={`
                                                 relative border-r border-b border-white/5 p-2 flex flex-col group
                                                 ${!isCurrentMonth ? "bg-white/[0.01] opacity-50" : "bg-transparent"}
                                                 hover:bg-white/[0.02] transition-colors
                                             `}
-                                            >
-                                                <div className="flex justify-between items-start mb-1">
-                                                    <div className={`
+                                                >
+                                                    <div className="flex justify-between items-start mb-1">
+                                                        <div className={`
                                                         text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full
                                                         ${isToday ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/50" : "text-white/40"}
                                                     `}>
-                                                        {format(day, "d")}
+                                                            {format(day, "d")}
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <div className="flex flex-col gap-1.5 flex-1 overflow-y-auto custom-scrollbar">
-                                                    {activeTripsOnDay.length > 0 && items.length === 0 && (
-                                                        activeTripsOnDay.map(trip => {
-                                                            const color = getColorForTrip(trip.id)
+                                                    <div className="flex flex-col gap-1.5 flex-1 overflow-y-auto custom-scrollbar">
+                                                        {activeTripsOnDay.length > 0 && items.length === 0 && (
+                                                            activeTripsOnDay.map(trip => {
+                                                                const color = getColorForTrip(trip.id)
+                                                                return (
+                                                                    <div key={trip.id} className={`h-1 w-full rounded-full ${color.bg} opacity-30`} />
+                                                                )
+                                                            })
+                                                        )}
+
+                                                        {items.map((item, idx) => {
+                                                            const color = getColorForTrip(item.tripId)
+                                                            const stop = item.data as CalendarStop;
+
                                                             return (
-                                                                <div key={trip.id} className={`h-1 w-full rounded-full ${color.bg} opacity-30`} />
-                                                            )
-                                                        })
-                                                    )}
-
-                                                    {items.map((item, idx) => {
-                                                        const color = getColorForTrip(item.tripId)
-                                                        const stop = item.data as CalendarStop;
-
-                                                        return (
-                                                            <div
-                                                                key={stop.id + idx}
-                                                                onClick={(e) => { e.stopPropagation(); /* Maybe show stop details? */ }}
-                                                                className={`
+                                                                <div
+                                                                    key={stop.id + idx}
+                                                                    onClick={(e) => { e.stopPropagation(); /* Maybe show stop details? */ }}
+                                                                    className={`
                                                                     text-[10px] px-2 py-1 rounded w-full truncate
                                                                     border-l-2 ${color.bg.replace('bg-', 'border-')}
                                                                     bg-white/5 hover:bg-white/10 transition-colors
                                                                     text-white/80 cursor-pointer shadow-sm
                                                                 `}
-                                                                title={stop.title}
-                                                            >
-                                                                {stop.title}
-                                                            </div>
-                                                        )
-                                                    })}
+                                                                    title={stop.title}
+                                                                >
+                                                                    {stop.title}
+                                                                </div>
+                                                            )
+                                                        })}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )
-                                    })}
-                                </motion.div>
-                            </AnimatePresence>
+                                            )
+                                        })}
+                                    </motion.div>
+                                </AnimatePresence>
+                            </div>
                         </div>
                     </div>
                 </main>
@@ -431,6 +433,13 @@ export default function CalendarPage() {
                 }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
                     background: rgba(255, 255, 255, 0.2);
+                }
+                .hide-scrollbar {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+                .hide-scrollbar::-webkit-scrollbar {
+                    display: none;
                 }
             `}</style>
         </div>

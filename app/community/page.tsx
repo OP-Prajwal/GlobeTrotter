@@ -9,6 +9,7 @@ import { GlassDropdown } from "@/app/search/GlassDropdown"
 import { ImageUploadZone } from "@/app/components/ImageUploadZone"
 import { format } from "date-fns"
 import { motion, AnimatePresence } from "framer-motion"
+import { toast } from "sonner" // Fixed missing import
 import AppHeader from "@/components/shared/AppHeader"
 
 // Comment Interface
@@ -83,14 +84,16 @@ export default function CommunityPage() {
                             setIsLoading(false)
                         },
                         (error) => {
-                            console.error("Geolocation error:", error)
-                            alert("Could not get your location. Showing all posts.")
+                            console.error("Location error:", error)
+                            // setIsLocating(false) - Removed undefined
+                            toast.error("Could not get your location. Showing all posts.")
                             setFilterBy("All")
                             setIsLoading(false)
                         }
                     )
                 } else {
-                    alert("Geolocation is not supported by your browser.")
+                    // setIsLocating(false) - Removed undefined
+                    toast.error("Geolocation is not supported by your browser.")
                     setFilterBy("All")
                     setIsLoading(false)
                 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Sparkles, User } from "lucide-react"
+import { toast } from "sonner"
 import { RecommendationFilters } from "@/app/components/recommend/RecommendationFilters"
 import { RecommendationList } from "@/app/components/recommend/RecommendationList"
 import { getRecommendations, type RecommendationItem } from "@/app/actions/recommendations"
@@ -13,11 +13,23 @@ export default function RecommendPage() {
     const [hasSearched, setHasSearched] = useState(false)
 
     const handleSearch = async (budget: number, location: string, date: string, activity: string) => {
-        setLoading(true)
-        setHasSearched(true)
-        const results = await getRecommendations(budget, location, date, activity)
-        setItems(results)
-        setLoading(false)
+        try {
+            setLoading(true)
+            setHasSearched(true)
+            const results = await getRecommendations(budget, location, date, activity)
+            setItems(results)
+
+            if (results.length > 0) {
+                toast.success(`Found ${results.length} recommendations!`)
+            } else {
+                toast.info("No exact matches found, try adjusting your budget.")
+            }
+        } catch (error) {
+            console.error("Search error:", error)
+            toast.error("Failed to fetch recommendations. Please try again.")
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (

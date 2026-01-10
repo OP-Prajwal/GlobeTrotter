@@ -1,9 +1,10 @@
 "use server"
 
 import { db } from "@/lib/db"
-import { trips, users } from "@/lib/db/schema"
+import { trips, users, likes } from "@/lib/db/schema"
 import { eq, desc, sql, and, ne, or } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
+import { createClient } from "@/lib/supabase/server"
 
 export type CommunityPost = {
     id: string
@@ -164,15 +165,54 @@ export async function shareTrip(tripId: string, location: string, description: s
     }
 }
 
+
+
 export async function likeTrip(tripId: string) {
     try {
-        await db.update(trips)
-            .set({ likesCount: sql`${trips.likesCount} + 1` })
-            .where(eq(trips.id, tripId))
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+
+        if (!user) {
+            return { success: false, error: "Unauthorized" }
+        }
+
+        // Get internal user ID
+        const dbUser = await db.query.users.findFirst({
+            where: eq(users.supabaseId, user.id)
+        })
+
+        if (!dbUser) {
+            return { success: false, error: "User not found" }
+        }
+
+        // Check if already liked
+        const existingLike = await db.query.likes.findFirst({
+            where: and(
+                eq(likes.userId, dbUser.id),
+                eq(likes.tripId, tripId)
+            )
+        })
+
+        if (existingLike) {
+            return { success: false, error: "Already liked" }
+        }
+
+        // Transaction: Insert like and increment count
+        await db.transaction(async (tx) => {
+            await tx.insert(likes).values({
+                userId: dbUser.id,
+                tripId: tripId
+            })
+
+            await tx.update(trips)
+                .set({ likesCount: sql`${trips.likesCount} + 1` })
+                .where(eq(trips.id, tripId))
+        })
 
         revalidatePath("/community")
         return { success: true }
     } catch (error) {
-        return { success: false }
+        console.error("Like error:", error)
+        return { success: false, error: "Failed to like" }
     }
 }

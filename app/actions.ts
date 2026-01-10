@@ -41,7 +41,7 @@ export async function createTrip(formData: FormData) {
             budget: "0", // Default budget
             userId: userId,
             isPublic: false,
-            // coverPhoto: coverPhoto // Schema doesn't have this yet, so we can't save it.
+            images: coverPhoto ? [coverPhoto] : [], // Save cover photo as the first image
         });
 
         console.log("Trip saved to DB:", { title, userId });

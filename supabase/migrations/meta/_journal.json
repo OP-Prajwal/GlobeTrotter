@@ -15,6 +15,13 @@
       "when": 1767425929957,
       "tag": "0001_tiny_masque",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1768009577463,
+      "tag": "0002_loose_brood",
+      "breakpoints": true
     }
   ]
 }

@@ -14,6 +14,7 @@ export const signupSchema = z.object({
     city: z.string().optional(),
     country: z.string().optional(),
     bio: z.string().optional(),
+    avatarUrl: z.string().optional(),
 })
 
 export type LoginValues = z.infer<typeof loginSchema>

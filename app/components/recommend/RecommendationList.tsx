@@ -2,6 +2,8 @@
 
 import { IndianRupee, MapPin, ExternalLink, User } from "lucide-react"
 import type { RecommendationItem } from "@/app/actions/recommendations"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 
 interface RecommendationListProps {
     items: RecommendationItem[]
@@ -25,10 +27,12 @@ export function RecommendationList({ items, hasSearched }: RecommendationListPro
 
     if (items.length === 0) {
         return (
-            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-10 border border-white/10 text-center">
-                <p className="text-white/50">No recommendations found within this budget/location.</p>
-                <p className="text-xs text-white/30 mt-2">Try increasing the budget or checking a nearby city.</p>
-            </div>
+            <Card className="bg-white/5 backdrop-blur-md border-white/10">
+                <CardContent className="flex flex-col items-center justify-center py-10 text-center">
+                    <p className="text-white/50">No recommendations found within this budget/location.</p>
+                    <p className="text-xs text-white/30 mt-2">Try increasing the budget or checking a nearby city.</p>
+                </CardContent>
+            </Card>
         )
     }
 
@@ -40,9 +44,9 @@ export function RecommendationList({ items, hasSearched }: RecommendationListPro
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {items.map((item) => (
-                    <div
+                    <Card
                         key={item.id}
-                        className="group bg-white/5 backdrop-blur-md border border-white/10 hover:border-indigo-500/30 rounded-2xl overflow-hidden transition-all hover:bg-white/[0.07] hover:shadow-xl hover:-translate-y-1 relative"
+                        className="group bg-white/5 border-white/10 hover:border-indigo-500/30 overflow-hidden transition-all hover:bg-white/[0.07] hover:shadow-xl hover:-translate-y-1 relative"
                     >
                         {/* Card Content */}
                         <div className="p-5">
@@ -83,12 +87,16 @@ export function RecommendationList({ items, hasSearched }: RecommendationListPro
                                         <span className="text-xs text-white/70 truncate max-w-[120px]">{item.tripTitle}</span>
                                     </div>
                                 </div>
-                                <button className="text-xs font-medium text-white/50 hover:text-white flex items-center gap-1 transition-colors">
+                                <Button
+                                    variant="link"
+                                    className="h-auto p-0 text-white/50 hover:text-white text-xs gap-1"
+                                    onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.title + " " + item.location)}`, '_blank')}
+                                >
                                     View <ExternalLink className="w-3 h-3" />
-                                </button>
+                                </Button>
                             </div>
                         </div>
-                    </div>
+                    </Card>
                 ))}
             </div>
         </div>

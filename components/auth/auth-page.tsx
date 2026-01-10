@@ -5,12 +5,22 @@ import { motion, AnimatePresence } from "framer-motion"
 import { LoginForm } from "@/components/auth/login-form"
 import { SignupForm } from "@/components/auth/signup-form"
 
+
 export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(true)
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[url('https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center overflow-hidden">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+        <div className="min-h-screen w-full flex items-center justify-center p-4 overflow-hidden relative">
+            <div
+                className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"
+                style={{ filter: 'brightness(0.6)' }}
+            />
+
+            {/* Ambient background effects */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-purple-900/30 to-blue-900/30" />
+            <div className="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-transparent via-black/20 to-black/80 pointer-events-none" />
+
+
 
             <div className="relative z-10 w-full max-w-4xl perspective-1000">
                 <AnimatePresence mode="wait" initial={false}>

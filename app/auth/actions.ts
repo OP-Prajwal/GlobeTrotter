@@ -46,9 +46,8 @@ export async function signup(data: SignupValues) {
                 first_name: data.firstName,
                 last_name: data.lastName,
                 phone: data.phone,
-                city: data.city,
-                country: data.country,
                 bio: data.bio,
+                avatar_url: data.avatarUrl,
             },
         },
     })
