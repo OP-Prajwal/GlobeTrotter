@@ -53,11 +53,11 @@ export function ProfileHeader({ initialProfile }: ProfileHeaderProps) {
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(120,119,198,0.1),transparent_50%)]" />
             </div>
 
-            <div className="px-8 pb-8">
-                <div className="relative flex flex-col md:flex-row items-start -mt-16 gap-6">
+            <div className="px-4 md:px-8 pb-8">
+                <div className="relative flex flex-col md:flex-row items-center md:items-start -mt-12 md:-mt-16 gap-4 md:gap-6">
                     {/* Avatar Group */}
                     <div className="relative group shrink-0">
-                        <div className="h-32 w-32 rounded-3xl border-4 border-[#0A0A0A] bg-zinc-800 shadow-xl overflow-hidden relative z-10">
+                        <div className="h-24 w-24 md:h-32 md:w-32 rounded-3xl border-4 border-[#0A0A0A] bg-zinc-800 shadow-xl overflow-hidden relative z-10">
                             {profile.avatarUrl ? (
                                 <Image
                                     src={profile.avatarUrl}
@@ -80,11 +80,11 @@ export function ProfileHeader({ initialProfile }: ProfileHeaderProps) {
                     </div>
 
                     {/* Content Section */}
-                    <div className="flex-1 w-full pt-16 md:pt-16">
+                    <div className="flex-1 w-full pt-4 md:pt-16 text-center md:text-left">
                         {isEditing ? (
-                            <div className="max-w-xl space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1.5">
+                            <div className="max-w-xl space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-200 mx-auto md:mx-0">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-1.5 text-left">
                                         <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider pl-1">First Name</label>
                                         <input
                                             type="text"
@@ -94,7 +94,7 @@ export function ProfileHeader({ initialProfile }: ProfileHeaderProps) {
                                             placeholder="First Name"
                                         />
                                     </div>
-                                    <div className="space-y-1.5">
+                                    <div className="space-y-1.5 text-left">
                                         <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider pl-1">Last Name</label>
                                         <input
                                             type="text"
@@ -105,7 +105,7 @@ export function ProfileHeader({ initialProfile }: ProfileHeaderProps) {
                                         />
                                     </div>
                                 </div>
-                                <div className="space-y-1.5">
+                                <div className="space-y-1.5 text-left">
                                     <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider pl-1">Bio</label>
                                     <textarea
                                         value={tempProfile.bio}
@@ -118,22 +118,22 @@ export function ProfileHeader({ initialProfile }: ProfileHeaderProps) {
                         ) : (
                             <div className="space-y-4">
                                 <div>
-                                    <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-2">
+                                    <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight flex items-center justify-center md:justify-start gap-2">
                                         {profile.firstName} {profile.lastName}
                                     </h1>
-                                    <div className="flex items-center gap-4 mt-2 text-zinc-400 text-sm">
+                                    <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 mt-2 text-zinc-400 text-sm">
                                         <span className="flex items-center gap-1.5">
                                             <Mail className="w-3.5 h-3.5" />
                                             {profile.email}
                                         </span>
-                                        <span className="w-1 h-1 rounded-full bg-zinc-700" />
+                                        <span className="hidden md:inline w-1 h-1 rounded-full bg-zinc-700" />
                                         <span className="flex items-center gap-1.5 text-indigo-400">
                                             <Sparkles className="w-3.5 h-3.5" />
                                             Travel Enthusiast
                                         </span>
                                     </div>
                                 </div>
-                                <p className="text-zinc-300 leading-relaxed max-w-2xl">
+                                <p className="text-zinc-300 leading-relaxed max-w-2xl mx-auto md:mx-0">
                                     {profile.bio || "No bio yet."}
                                 </p>
                             </div>
@@ -141,7 +141,7 @@ export function ProfileHeader({ initialProfile }: ProfileHeaderProps) {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="absolute top-4 right-4 md:static md:mt-16 md:mr-0 z-10">
+                    <div className="static md:absolute md:top-4 md:right-4 md:mt-16 md:mr-0 z-10 w-full md:w-auto flex justify-center md:block mt-4 md:mt-0">
                         {isEditing ? (
                             <div className="flex items-center gap-2">
                                 <button
@@ -162,10 +162,10 @@ export function ProfileHeader({ initialProfile }: ProfileHeaderProps) {
                         ) : (
                             <button
                                 onClick={() => setIsEditing(true)}
-                                className="p-2 md:px-4 md:py-2 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all flex items-center gap-2"
+                                className="w-full md:w-auto justify-center p-2 md:px-4 md:py-2 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all flex items-center gap-2"
                             >
                                 <Edit2 className="w-4 h-4" />
-                                <span className="hidden md:inline">Edit Profile</span>
+                                <span className="">Edit Profile</span>
                             </button>
                         )}
                     </div>

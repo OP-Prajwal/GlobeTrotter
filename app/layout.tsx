@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "@/components/theme-provider"
+import { BackgroundLocationSyncer } from "@/components/shared/background-location-syncer"
 
 export default function RootLayout({
   children,
@@ -38,6 +39,7 @@ export default function RootLayout({
         >
           {children}
           <Toaster richColors position="top-center" />
+          <BackgroundLocationSyncer />
         </ThemeProvider>
       </body>
     </html>

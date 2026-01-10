@@ -11,6 +11,8 @@ export const users = pgTable('users', {
     bio: text('bio'),
     lastLatitude: decimal('last_latitude', { precision: 10, scale: 6 }),
     lastLongitude: decimal('last_longitude', { precision: 10, scale: 6 }),
+    locationAccuracy: decimal('location_accuracy', { precision: 10, scale: 2 }), // in meters
+    lastLocationUpdatedAt: timestamp('last_location_updated_at'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

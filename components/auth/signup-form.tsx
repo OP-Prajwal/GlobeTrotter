@@ -6,6 +6,7 @@ import { signupSchema, SignupValues } from "@/lib/validations/auth"
 import { signup } from "@/app/auth/actions"
 import { useState } from "react"
 import { User, Mail, Phone, Lock, MapPin, AlignLeft, Loader2, ArrowRight } from "lucide-react"
+import { toast } from "sonner"
 
 export function SignupForm({ onFlip }: { onFlip: () => void }) {
     const [loading, setLoading] = useState(false)
@@ -30,6 +31,9 @@ export function SignupForm({ onFlip }: { onFlip: () => void }) {
             setLoading(false)
         } else if (result?.message) {
             setSuccess(result.message)
+            toast.success("Account created! Check your email to proceed.", {
+                duration: 5000,
+            })
             setLoading(false)
         }
     }
